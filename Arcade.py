@@ -1,6 +1,7 @@
 import Battleship
 import maze_game_release
 import hangman
+import goFish
 
 def is_integer(n):
 	try:
@@ -11,11 +12,11 @@ def is_integer(n):
 		return float(n).is_integer()
 
 def main():
-	game_count = 3
+	game_count = 4
 	print("Welcome to Eric's Arcade!\nSelect a game you'd like to play:")
 	quit = False #exit arcade if true
 	while not quit:
-		print("0. Quit\n1. Battleship\n2. Maze Game\n3. Hangman")
+		print("0. Quit\n1. Battleship\n2. Maze Game\n3. Hangman\n4. Go Fish!")
 		valid = False
 		while not valid:
 			inp = input("> ")
@@ -37,6 +38,8 @@ def main():
 				maze_game_release.main()
 			elif inp == "3":
 				hangman.main()
+			elif inp == "4":
+				goFish.main()
 
 		
 
