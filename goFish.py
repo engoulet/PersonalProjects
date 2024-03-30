@@ -31,14 +31,14 @@ def main():
 		playerCanStillPlay = True
 		
 		while not gameOver:
-			printHands(hands, completeSets, names)
+			if currentTurn == 0: printHands(hands, completeSets, names)
 
 			#check for empty hand
 			if len(hands[currentTurn]) == 0:
 				print("%s's hand is empty. Drawing one card automatically\n" % (names[currentTurn]))
 				newCard = drawCard(cardsDrawn)
 				if newCard == -1: 
-					print("The deck is empty, %s's turn is skipped..." % (names[currentTurn]))
+					print("The deck is empty, %s's turn is skipped...\n" % (names[currentTurn]))
 					if currentTurn == 0 and playerCanStillPlay:
 						print("\n\n\nYou can no longer play. In a few seconds, the remainder of the game will be sped up.\n\n")
 						waitSeconds(10)
@@ -53,7 +53,7 @@ def main():
 					if currentTurn == 0:
 						print("%s drew the %s" % (names[currentTurn], displayCard(newCard)))
 
-				printHands(hands, completeSets, names)
+				if currentTurn == 0: printHands(hands, completeSets, names)
 
 			#take input from either the player or the bot
 
@@ -104,6 +104,7 @@ def main():
 				if cardsStolen == 1: tense = "it"
 
 				print("%s has %d and gives %s to %s" % (names[inp[1]], cardsStolen, tense, names[currentTurn]))
+			print("\n")
 
 			
 			#check if player completed any sets of cards
@@ -197,7 +198,7 @@ def checkForSets(hand, player, completeSets, names):
 			if counter[cardNum] == 4:
 				completeSets[player].append(cardNum)
 				cardsToRemove[cardNum] = True
-				print("\n%s completed the set of %s's\n" % (names[player], cardNum))
+				print("%s completed the set of %s's\n" % (names[player], cardNum))
 	
 	#remove the cards that have become complete sets from the player's hand
 	i = 0
@@ -215,12 +216,12 @@ def waitSeconds(secs):
 	while (temp_time - cur_time) < secs:
 		temp_time = time.time()
 
-#takes the card ID number (1 - 52) and returns it in a nicer format (5'S for 5 of spades or K'D for king of diamonds)
+#takes the card ID number (1 - 52) and returns it in a nicer format (5~S for 5 of spades or K~D for king of diamonds)
 def displayCard(id):
 	num = evalNum(id)
 	suit = evalSuit(id)
 
-	return "%s'%s" % (num, suit)
+	return "%s~%s" % (num, suit)
 
 
 #takes an id and returns its corresponding card number

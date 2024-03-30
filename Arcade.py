@@ -13,10 +13,22 @@ def is_integer(n):
 
 def main():
 	game_count = 4
-	print("Welcome to Eric's Arcade!\nSelect a game you'd like to play:")
 	quit = False #exit arcade if true
 	while not quit:
-		print("0. Quit\n1. Battleship\n2. Maze Game\n3. Hangman\n4. Go Fish!")
+		print("+----------------------------------------------------------+")
+		print("|      __      ____     ____      __      _____    ____    |")
+		print("|     /  \\    | __ \\   / ___\\    /  \\    |  __ \\  |  __|   |")
+		print("|    / /\\ \\   | |_| | | |       / /\\ \\   | |  | | | \\__    |")
+		print("|   / ____ \\  |  _ /  | |____  / ____ \\  | |__| | | /__    |")
+		print("|  /_/    \\_\\ |_| \\_\\  \\____/ /_/    \\_\\ |_____/  |____|   |")
+		print("|__________________________________________________________|")
+		print("|                                                          |")
+		print("|    0: Quit                                               |")
+		print("|    1: Battleship                                         |")
+		print("|    2: Maze Game                                          |")
+		print("|    3: Hangman                                            |")
+		print("|    4: Go Fish!                                           |")
+		print("+----------------------------------------------------------+")
 		valid = False
 		while not valid:
 			inp = input("> ")
