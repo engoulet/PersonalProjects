@@ -5,6 +5,8 @@ Some of these projects were developed at greatly varying points in time and, con
 
 Development timelines:
 -----------------------------
+Go Fish: Summer 2023
+
 Arcade (compilation of previous games): Winter 2020/21
 
 Battleship: Winter 2020/21
@@ -12,3 +14,5 @@ Battleship: Winter 2020/21
 Hangman: Summer 2019
 
 Maze Game: Summer 2019
+
+
