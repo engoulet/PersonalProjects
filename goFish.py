@@ -1,44 +1,39 @@
 import random, time, sys
+from Deck import Deck
+from GoFishPlayer import Player
 
 def main():
 	endOfSession = False
 	while not endOfSession:
 		#initialize game and ask how many opponents to face
-		opponents, names = initGame()
+		opponents, players = initGame()
 		
-		cardsDrawn = {}  #tracks what cards can no longer be drawn
-		hands = [[]]  #stores all player hands
-		completeSets = [[]] #stores the completed sets of cards as players gather them
-		
-		#add opponents hands
-		for i in range(0, opponents):
-			hands.append([])
-			completeSets.append([])
+		deck = Deck()  #tracks the deck of cards
 
 		#deal 7 cards to each player
 		for i in range(0, 7):
-			for hand in hands:
-				hand.append(drawCard(cardsDrawn))
+			for player in players:
+				player.hand.append(deck.drawCard())
 
 		#check for complete sets
-		for i, hand in enumerate(hands):
-			checkForSets(hand, i, completeSets, names)
+		for player in players:
+			checkForSets(player)
 
 		#begin play
 		gameOver = False
 		currentTurn = 0  #tracks which player's turn it is
-		botTurnTime = 5
-		playerCanStillPlay = True
+		botTurnTime = 5  #number of seconds in between each bot's turn
+		playerCanStillPlay = True  #set to false once the player can no longer draw or play any cards
 		
 		while not gameOver:
-			if currentTurn == 0: printHands(hands, completeSets, names)
+			if currentTurn == 0: printHands(players)
 
 			#check for empty hand
-			if len(hands[currentTurn]) == 0:
-				print("%s's hand is empty. Drawing one card automatically\n" % (names[currentTurn]))
-				newCard = drawCard(cardsDrawn)
+			if len(players[currentTurn].hand) == 0:
+				print("%s's hand is empty. Drawing one card automatically\n" % (players[currentTurn].name))
+				newCard = deck.drawCard()
 				if newCard == -1: 
-					print("The deck is empty, %s's turn is skipped...\n" % (names[currentTurn]))
+					print("The deck is empty, %s's turn is skipped...\n" % (players[currentTurn].name))
 					if currentTurn == 0 and playerCanStillPlay:
 						print("\n\n\nYou can no longer play. In a few seconds, the remainder of the game will be sped up.\n\n")
 						waitSeconds(10)
@@ -48,12 +43,12 @@ def main():
 					currentTurn = (currentTurn + 1) % (opponents + 1)
 					continue
 				else:
-					hands[currentTurn].append(newCard)
+					players[currentTurn].hand.append(newCard)
 					#tell player what they drew
 					if currentTurn == 0:
-						print("%s drew the %s" % (names[currentTurn], displayCard(newCard)))
+						print("%s drew the %s" % (players[currentTurn].name, newCard.displayCard()))
 
-				if currentTurn == 0: printHands(hands, completeSets, names)
+				if currentTurn == 0: printHands(players)
 
 			#take input from either the player or the bot
 
@@ -65,17 +60,18 @@ def main():
 					inp = str.capitalize(input(">>>  "))
 	
 					#check for proper input
-					if proper_input(inp, hands[currentTurn], opponents):
+					if proper_input(inp, players[currentTurn].hand, opponents):
 						validInp = True
 
 			else:  #bot's turn
-				#wait a few seconds
-				waitSeconds(botTurnTime)
+
+				#TO DO: implement difficulty 
 
 				#select a number and player
-				num = evalNum(hands[currentTurn][random.randint(0, len(hands[currentTurn]) - 1)])
+				num = players[currentTurn].hand[random.randint(0, len(players[currentTurn].hand) - 1)].evalNum()
 				player = random.randint(0, opponents)
-				while player == currentTurn or len(hands[player]) == 0:
+
+				while player == currentTurn or len(players[player].hand) == 0:
 					player = random.randint(0, opponents)
 
 
@@ -86,44 +82,47 @@ def main():
 			#eval input and collect the cards
 			inp = inp.split("-")
 			inp[1] = int(inp[1])
-			cardsStolen = collectCardsFromOpp(hands, inp[0], inp[1], currentTurn)
+			cardsStolen = collectCardsFromOpp(inp[0], players[inp[1]], players[currentTurn])
 			
-			print("%s asks for %s's from %s..." % (names[currentTurn], inp[0], names[inp[1]]))
+			print("%s asks for %s's from %s..." % (players[currentTurn].name, inp[0], players[inp[1]].name))
 			if cardsStolen == 0:
-				newCard = drawCard(cardsDrawn)
+				newCard = deck.drawCard()
 				if newCard == -1:
-					print("Go Fish!\nThe deck is empty, %s cannot draw a card..." % (names[currentTurn]))
+					print("Go Fish!\nThe deck is empty, %s cannot draw a card..." % (players[currentTurn].name))
 				else:
-					print("Go Fish!\nDrawing a new card into %s's hand..." % (names[currentTurn]))
-					hands[currentTurn].append(newCard)
+					print("Go Fish!\nDrawing a new card into %s's hand..." % (players[currentTurn].name))
+					players[currentTurn].hand.append(newCard)
 					#tell player what they drew
 					if currentTurn == 0:
-						print("%s drew the %s" % (names[currentTurn], displayCard(newCard)))
+						print("%s drew the %s" % (players[currentTurn].name, newCard.displayCard()))
 			else:
 				tense = "them"
 				if cardsStolen == 1: tense = "it"
 
-				print("%s has %d and gives %s to %s" % (names[inp[1]], cardsStolen, tense, names[currentTurn]))
+				print("%s has %d and gives %s to %s" % (players[inp[1]].name, cardsStolen, tense, players[currentTurn].name))
 			print("\n")
 
 			
 			#check if player completed any sets of cards
-			checkForSets(hands[currentTurn], currentTurn, completeSets, names)
+			checkForSets(players[currentTurn])
+
+			#wait a few seconds
+			waitSeconds(botTurnTime)
 
 			#check if game over
-			for i, hand in enumerate(hands):
-				if len(hand) != 0:
+			for i, player in enumerate(players):
+				if len(player.hand) != 0:
 					break
-				if i == len(hands) - 1 and len(cardsDrawn) == 52: 
+				if i == len(players) - 1 and len(deck.cardsDrawn) == 52: 
 					#reached end of list (all players have no cards) and deck is empty
 					gameOver = True
 				
 			currentTurn = (currentTurn + 1) % (opponents + 1)
 
-		printHands(hands, completeSets, names)
-		decideWinner(completeSets, names)
+		printHands(players)
+		decideWinner(players)
 
-		print("Would you like to play again?")
+		print("Would you like to play again? (Y/N)")
 		valid = False
 		while not valid:
 			inp = input(">>>  ")
@@ -146,30 +145,30 @@ def initGame():
 			if opponents >= 1 and opponents <= 6:
 				nameList = ["Joe", "Randy", "Cole", "Sarah", "Tony", "Regenald", "Tim", "Frank", "Betty", "Penny", "Jenny", "Kate", "Hannah", "Barry", "Sally"]
 
-				names = []
-				names.append(input("What would you like your name to be?\n>>>  "))
+				players = []
+				players.append(Player(input("What would you like your name to be?\n>>>  ")))
 			
 				for i in range(0, opponents):
-					names.append(nameList.pop(random.randint(0, len(nameList) - 1)))
+					players.append(Player(nameList.pop(random.randint(0, len(nameList) - 1))))
 			
-				return opponents, names
+				return opponents, players
 			else: 
 				print("Invalid input!")
 		else:
 			print("Invalid input!")
 
-def decideWinner(completeSets, names):
+def decideWinner(players):
 	print("Game Over!")
-	max = 0
+	max = -1
 	winners = None
 	#determine who the winner(s) are
-	for i, hand in enumerate(completeSets):
-		if len(hand) > max:
-			max = len(hand)
+	for player in players:
+		if len(player.completeSets) > max:
+			max = len(player.completeSets)
 			winners = []
-			winners.append(names[i])
-		elif len(hand) == max:
-			winners.append(names[i])
+			winners.append(player.name)
+		elif len(player.completeSets) == max:
+			winners.append(player.name)
 			
 	#if it's a tie
 	if len(winners) > 1:
@@ -183,28 +182,28 @@ def decideWinner(completeSets, names):
 
 
 #checks for complete sets of cards for a player
-def checkForSets(hand, player, completeSets, names):
+def checkForSets(player):
 	counter = {}
 	cardsToRemove = {}
 
 	#count the cards of each number and add them to the complete sets
-	for card in hand:
-		cardNum = evalNum(card)
+	for card in player.hand:
+		cardNum = card.evalNum()
 
 		if cardNum not in counter:
 			counter[cardNum] = 1
 		else:
 			counter[cardNum] += 1
 			if counter[cardNum] == 4:
-				completeSets[player].append(cardNum)
+				player.completeSets.append(cardNum)
 				cardsToRemove[cardNum] = True
-				print("%s completed the set of %s's\n" % (names[player], cardNum))
+				print("%s completed the set of %s's\n\n" % (player.name, cardNum))
 	
 	#remove the cards that have become complete sets from the player's hand
 	i = 0
-	while i < len(hand):
-		if cardsToRemove.get(evalNum(hand[i])):
-			hand.pop(i)
+	while i < len(player.hand):
+		if cardsToRemove.get(player.hand[i].evalNum()):
+			player.hand.pop(i)
 		else:
 			i += 1
 
@@ -216,57 +215,17 @@ def waitSeconds(secs):
 	while (temp_time - cur_time) < secs:
 		temp_time = time.time()
 
-#takes the card ID number (1 - 52) and returns it in a nicer format (5~S for 5 of spades or K~D for king of diamonds)
-def displayCard(id):
-	num = evalNum(id)
-	suit = evalSuit(id)
-
-	return "%s~%s" % (num, suit)
-
-
-#takes an id and returns its corresponding card number
-def evalNum(id):
-	num = id % 13
-	if num == 1: num = "A"
-	elif num == 11: num = "J"
-	elif num == 12: num = "Q"
-	elif num == 0: num = "K"
-	else: num = str(num)
-
-	return num
-
-
-#takes an id and returns its corresponding suit
-def evalSuit(id):
-	temp = int(id / 13)
-	if temp == 0: suit = "D"
-	elif temp == 1: suit = "S"
-	elif temp == 2: suit = "C"
-	else: suit = "H"
-
-	return suit
-
-
-#takes a card ID number (1 - 52) and checks if it matches the provided card number (0 - 12)
-def compareCard(num, id):
-	if num == "A" and id % 13 == 1: return True
-	elif num == "J" and id % 13 == 11: return True
-	elif num == "Q" and id % 13 == 12: return True
-	elif num == "K" and id % 13 == 0: return True
-	elif num.isdigit() and int(num) == id % 13: return True
-	else: return False 
-
 
 #collects all cards that match the number of the "num" param (0 - 12) from the target player and give them to the destination player (dest)
 #returns how many cards were collected
-def collectCardsFromOpp(hands, num, target, dest):
+def collectCardsFromOpp(num, target, dest):
 	count = 0  #count how many card are found
 
 	#loop through the hand of the target player
 	i = 0
-	while i < len(hands[target]):
-		if compareCard(num, hands[target][i]):  #if the card matches the desired number, take it
-			hands[dest].append(hands[target].pop(i))
+	while i < len(target.hand):
+		if target.hand[i].hasValueOf(num):  #if the card matches the desired number, take it
+			dest.hand.append(target.hand.pop(i))
 			count = count + 1
 		else:
 			i += 1
@@ -274,38 +233,25 @@ def collectCardsFromOpp(hands, num, target, dest):
 	return count
 
 
-def drawCard(cardsDrawn):
-	if len(cardsDrawn) >= 52:
-		return -1
-	
-	card = random.randint(1,52)
-
-	while cardsDrawn.get(card) == True:
-		card = random.randint(1,52)
-
-	cardsDrawn[card] = True
-	return card
-
-
-def printHands(hands, completedSets, names):
-	debug = False  #true if verbose player hands is enabled
+def printHands(players):
+	debug = True  #true if verbose player hands is enabled
 	print()
-	for i, hand in enumerate(hands):
+	for i, player in enumerate(players):
 		#sort the hand
 		temp = []
-		for card in hand:
-			temp.append(displayCard(card))
+		for card in player.hand:
+			temp.append(card.displayCard())
 		temp = sorted(temp)
 
 		#print the hand
-		sys.stdout.write("Player %d (%s):\n[  " % (i, names[i]))
+		sys.stdout.write("Player %d (%s):\n[  " % (i, player.name))
 		for card in temp:
 			if (i == 0) or (i != 0 and debug):
 				sys.stdout.write(card + "  ")
 			else:
 				sys.stdout.write("***  ")
 		sys.stdout.write("]    [  ")
-		for number in completedSets[i]:
+		for number in player.completeSets:
 			sys.stdout.write(number + "  ")
 		sys.stdout.write("]\n\n")
 
@@ -339,7 +285,7 @@ def proper_input(inp, hand, opponents):
 	
 	#formatting is correct, now check if the action is valid
 	for card in hand:
-		if compareCard(inp.split("-")[0], card):
+		if card.hasValueOf(inp.split("-")[0]):
 			return True 
 
 	print("Invalid input! You don't have the card you asked for")
