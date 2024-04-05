@@ -234,7 +234,7 @@ def collectCardsFromOpp(num, target, dest):
 
 
 def printHands(players):
-	debug = True  #true if verbose player hands is enabled
+	debug = False  #true if verbose player hands is enabled
 	print()
 	for i, player in enumerate(players):
 		#sort the hand
