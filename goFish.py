@@ -2,6 +2,8 @@ import random, time, sys
 from Deck import Deck
 from GoFishPlayer import Player
 
+debug = True  #true if verbose player hands is enabled
+
 def main():
 	endOfSession = False
 	while not endOfSession:
@@ -12,8 +14,9 @@ def main():
 
 		#deal 7 cards to each player
 		for i in range(0, 7):
-			for player in players:
-				player.hand.append(deck.drawCard())
+			for j, player in enumerate(players):
+				newCard = deck.drawCard(True) if (j == 0 or debug) else deck.drawCard(False)
+				player.hand.append(newCard)
 
 		#check for complete sets
 		for player in players:
@@ -31,8 +34,8 @@ def main():
 			#check for empty hand
 			if len(players[currentTurn].hand) == 0:
 				print("%s's hand is empty. Drawing one card automatically\n" % (players[currentTurn].name))
-				newCard = deck.drawCard()
-				if newCard == -1: 
+				newCard = deck.drawCard(True) if (currentTurn == 0 or debug) else deck.drawCard(False)
+				if newCard == None: 
 					print("The deck is empty, %s's turn is skipped...\n" % (players[currentTurn].name))
 					if currentTurn == 0 and playerCanStillPlay:
 						print("\n\n\nYou can no longer play. In a few seconds, the remainder of the game will be sped up.\n\n")
@@ -86,8 +89,8 @@ def main():
 			
 			print("%s asks for %s's from %s..." % (players[currentTurn].name, inp[0], players[inp[1]].name))
 			if cardsStolen == 0:
-				newCard = deck.drawCard()
-				if newCard == -1:
+				newCard = deck.drawCard(True) if (currentTurn == 0 or debug) else deck.drawCard(False)
+				if newCard == None:
 					print("Go Fish!\nThe deck is empty, %s cannot draw a card..." % (players[currentTurn].name))
 				else:
 					print("Go Fish!\nDrawing a new card into %s's hand..." % (players[currentTurn].name))
@@ -234,7 +237,6 @@ def collectCardsFromOpp(num, target, dest):
 
 
 def printHands(players):
-	debug = False  #true if verbose player hands is enabled
 	print()
 	for i, player in enumerate(players):
 		#sort the hand
@@ -246,13 +248,13 @@ def printHands(players):
 		#print the hand
 		sys.stdout.write("Player %d (%s):\n[  " % (i, player.name))
 		for card in temp:
-			if (i == 0) or (i != 0 and debug):
-				sys.stdout.write(card + "  ")
-			else:
-				sys.stdout.write("***  ")
+			sys.stdout.write(card + "  ")
+	
+		#print complete sets
 		sys.stdout.write("]    [  ")
 		for number in player.completeSets:
 			sys.stdout.write(number + "  ")
+
 		sys.stdout.write("]\n\n")
 
 

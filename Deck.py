@@ -6,16 +6,15 @@ class Deck():
 	def __init__(self):
 		self.cardsDrawn = {}
 
-
 	#returns a card object, returns -1 otherwise
-	def drawCard(self):
+	def drawCard(self, faceup):
 		if len(self.cardsDrawn) >= 52:
-			return -1
+			return None
 		
-		card = Card()
+		card = Card(faceup)
 
 		while self.cardsDrawn.get(card.getID()) == True:
-			card = Card()
+			card = Card(faceup)
 
 		self.cardsDrawn[card.getID()] = True
 		return card

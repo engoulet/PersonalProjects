@@ -2,11 +2,18 @@ import random, time, sys
 
 class Card():
 
-	def __init__(self):
+	def __init__(self, faceup):
 		self.id = random.randint(1,52)
+		self.faceup = faceup
 
 	def getID(self):
 		return self.id
+
+	def getFaceup(self):
+		return self.faceup
+
+	def setFaceup(self, inp):
+		self.faceup = inp
 
 	#takes an id and returns its corresponding card number
 	def evalNum(self):
@@ -33,7 +40,8 @@ class Card():
 
 	#takes the card ID number (1 - 52) and returns it in a nicer format (5~S for 5 of spades or K~D for king of diamonds)
 	def displayCard(self):
-		return "%s~%s" % (self.evalNum(), self.evalSuit())
+		if self.faceup: return "%s~%s" % (self.evalNum(), self.evalSuit())
+		return "***"
 
 
 	#takes card ID number (1 - 52) and checks if it matches the provided card number (0 - 12)
