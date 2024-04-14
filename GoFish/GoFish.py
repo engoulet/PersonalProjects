@@ -8,7 +8,7 @@ from Utils.Deck import Deck
 
 
 
-debug = True  #true if verbose player hands is enabled
+debug = False  #true if verbose player hands is enabled
 
 def main():
 	endOfSession = False
