@@ -1,6 +1,12 @@
-import random, time, sys
-from Deck import Deck
-from GoFishPlayer import Player
+import random, time, sys, os
+
+#add parent directory to the system path so sibling modules can be imported
+sys.path.insert(0, "\\".join(os.path.realpath(__file__).split("\\")[0:-2]))
+
+from GoFish.GoFishPlayer import Player
+from Utils.Deck import Deck
+
+
 
 debug = True  #true if verbose player hands is enabled
 
@@ -56,15 +62,19 @@ def main():
 			#take input from either the player or the bot
 
 			if currentTurn == 0:  #player's turn
-				print("What card would you like to ask for, and from whom? \n(Format: Card-Player  |  Ex: A-1  --> requests Ace's from player 1)")
+				print("What card would you like to ask for, and from whom? \n(Format: Card-Player  |  Ex: A-1  --> requests Ace's from player 1)\n(type \"quit\" to quit)")
 				
 				validInp = False
 				while not validInp:
-					inp = str.capitalize(input(">>>  "))
-	
+					inp = str.upper(input(">>>  "))
+
+					if (inp == "QUIT"):
+						return
+
 					#check for proper input
 					if proper_input(inp, players[currentTurn].hand, opponents):
 						validInp = True
+
 
 			else:  #bot's turn
 

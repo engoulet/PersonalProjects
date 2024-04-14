@@ -46,6 +46,7 @@ def draw_game(board, game_letters, wrong_letters):
         line = line + letter + ' '
         
     print(line)
+    print()
     
         
     
@@ -87,7 +88,6 @@ def main():
         
         
         print()
-        print('type "quit" to quit')
         print('start guessing!!!')
         
         wrong_count = 0
@@ -101,7 +101,7 @@ def main():
             
             valid_input = False
             while not valid_input:
-            
+                print('Guess a letter (type "quit" to quit)')
                 user_inp = input('>  ')
                 
                 if user_inp == 'quit':

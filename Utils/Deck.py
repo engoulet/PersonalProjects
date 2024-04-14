@@ -1,5 +1,5 @@
 import random, time, sys
-from Card import Card
+from Utils.Card import Card
 
 class Deck():
 

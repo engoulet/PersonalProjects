@@ -1,7 +1,7 @@
-import Battleship
-import MazeGame
-import Hangman
-import GoFish
+import Battleship.Battleship as battleship
+import MazeGame as mazeGame
+import Hangman as hangman
+import GoFish.GoFish as goFish
 
 def is_integer(n):
 	try:
@@ -45,13 +45,13 @@ def main():
 			if inp == "0":
 				quit = True
 			elif inp == "1":
-				Battleship.main()
+				battleship.main()
 			elif inp == "2":
-				MazeGame.main()
+				mazeGame.main()
 			elif inp == "3":
-				Hangman.main()
+				hangman.main()
 			elif inp == "4":
-				GoFish.main()
+				goFish.main()
 
 		
 
