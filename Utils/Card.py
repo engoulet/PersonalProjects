@@ -4,7 +4,7 @@ class Card():
 
 	def __init__(self, faceup):
 		self.id = random.randint(1,52)
-		self.faceup = faceup
+		self.faceup = faceup #Boolean determining if this card is displayed faceup or facedown
 
 	def getID(self):
 		return self.id
